@@ -16,10 +16,7 @@ function Metronome() {
   const [timeSignature, setTimeSignature] = useState('4/4'); 
 
   let synth = new Tone.Synth({ oscillator: { type: 'sine' } }).toMaster();
-
-  useEffect(() => {
-    synth.volume.value = Tone.gainToDb(volume);
-  }, [volume]);
+  synth.volume.value = Tone.gainToDb(volume);
 
   useEffect(() => {
     let interval;
@@ -29,20 +26,22 @@ function Metronome() {
       interval = setInterval(() => {
         for (let i = 0; i < beatsPerMeasure; i++) {
           if (i === 0) {
-            synth.volume.value = Tone.gainToDb(volume + 2);
+            if (timeSignature === '3/4') {
+              synth.triggerAttackRelease(selectedNote, '8n', Tone.now() + (i * (60 / bpm)) - 0.05);
+            } else {
+              synth.triggerAttackRelease(selectedNote, '8n', Tone.now() + (i * (60 / bpm)) - 0.02);
+            }
           } else {
-            synth.volume.value = Tone.gainToDb(volume);
+            synth.triggerAttackRelease(selectedNote, '8n', Tone.now() + (i * (60 / bpm)));
           }
-          synth.triggerAttackRelease(selectedNote, '8n', Tone.now() + (i * (60 / bpm)));
         }
-        synth.volume.value = Tone.gainToDb(volume);
       }, (60 / bpm) * 1000);
     } else {
       clearInterval(interval);
     }
 
     return () => clearInterval(interval);
-  }, [isPlaying, bpm, selectedNote, timeSignature, volume]);
+  }, [isPlaying, bpm, selectedNote, timeSignature]);
 
   const handleStartStop = () => {
     setIsPlaying(!isPlaying);
@@ -68,44 +67,18 @@ function Metronome() {
 
   return (
     <div className="card-container">
-      <h1>Metronome</h1>
+      <h1>Metonome</h1>
       <div className="card-content">
           
-        <div className="card-content-section">
-          BPM: 
+        <bpmInput>BPM: 
           <input
             type="number"
             value={bpm}
             onChange={(e) => setBpm(e.target.value)}
             disabled={isPlaying}
           />
-        </div>
-        <div className="card-content-section">
-          Tone:
-          <select value={selectedNote} onChange={handleNoteChange} disabled={isPlaying}>
-            <option value="C2">C2</option>
-            <option value="D2">D2</option>
-            <option value="E2">E2</option>
-            <option value="F2">F2</option>
-            <option value="G2">G2</option>
-            <option value="A2">A2</option>
-            <option value="B2">B2</option>
-          </select>
-        </div>
-        <div className="card-content-section">
-          <label>
-            Time Signature:
-            <select value={timeSignature} onChange={handleTimeSignatureChange} disabled={isPlaying}>
-              <option value="4/4">4/4</option>
-              <option value="3/4">3/4</option>
-            </select>
-          </label>
-        </div>
-      </div>
-      <br />
-      <div className="card-content-section">
-        <label> 
-          Volume:
+        </bpmInput>
+        <label> Volume:
           <input
             type="range"
             min="0"
@@ -113,17 +86,37 @@ function Metronome() {
             step="0.1"
             value={volume}
             onChange={handleVolumeChange}
+            disabled={isPlaying}
           />    
+            Tone:
+            <select value={selectedNote} onChange={handleNoteChange} disabled={isPlaying}>
+              <option value="C2">C2</option>
+              <option value="D2">D2</option>
+              <option value="E2">E2</option>
+              <option value="F2">F2</option>
+              <option value="G2">G2</option>
+              <option value="A2">A2</option>
+              <option value="B2">B2</option>
+            </select>
         </label>
-        <button onClick={handleStartStop}>
+        <div>
+          <label>
+          Time Signature:
+          <select value={timeSignature} onChange={handleTimeSignatureChange} disabled={isPlaying}>
+            <option value="4/4">4/4</option>
+            <option value="3/4">3/4</option>
+            </select>
+          </label>
+        </div>
+        <button onClick={handleStartStop} >
           {isPlaying ? 'Stop' : 'Start'}
         </button>
-      </div>
-      <br />
-      <div className="card-content-section">
-        <button onClick={handlePlaySingleBeat}>
-          Play Single Beat
-        </button>
+          <div>
+          <button onClick={handlePlaySingleBeat}>
+            Play Single Beat
+          </button>
+          </div>
+
       </div>
     </div>
   );

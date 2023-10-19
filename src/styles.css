@@ -18,8 +18,9 @@ body {
 .card-container {
   position: relative;
   display: flex;
+  left: 33%;
   flex-direction: column;
-  max-width: 300px;
+  max-width: 350px;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -31,6 +32,9 @@ body {
     /* Add your card content styles here */
   }
   
+  .card-content-section {
+    /* Add your card content styles here */
+  }
   .card-container a {
     text-decoration: none;
     color: #333;

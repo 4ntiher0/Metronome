@@ -16,10 +16,7 @@ function Metronome() {
   const [timeSignature, setTimeSignature] = useState('4/4'); 
 
   let synth = new Tone.Synth({ oscillator: { type: 'sine' } }).toMaster();
-
-  useEffect(() => {
-    synth.volume.value = Tone.gainToDb(volume);
-  }, [volume]);
+  synth.volume.value = Tone.gainToDb(volume);
 
   useEffect(() => {
     let interval;
@@ -29,13 +26,13 @@ function Metronome() {
       interval = setInterval(() => {
         for (let i = 0; i < beatsPerMeasure; i++) {
           if (i === 0) {
-            synth.volume.value = Tone.gainToDb(volume + 2);
+            synth.volume.value = Tone.gainToDb(volume + 2); // Increase volume for the first beat
           } else {
             synth.volume.value = Tone.gainToDb(volume);
           }
           synth.triggerAttackRelease(selectedNote, '8n', Tone.now() + (i * (60 / bpm)));
         }
-        synth.volume.value = Tone.gainToDb(volume);
+        synth.volume.value = Tone.gainToDb(volume); // Reset volume back to original
       }, (60 / bpm) * 1000);
     } else {
       clearInterval(interval);
@@ -67,12 +64,12 @@ function Metronome() {
   };
 
   return (
+
     <div className="card-container">
       <h1>Metronome</h1>
       <div className="card-content">
-          
-        <div className="card-content-section">
-          BPM: 
+      <div className="card-content-section">
+        <div >BPM: 
           <input
             type="number"
             value={bpm}
@@ -80,32 +77,31 @@ function Metronome() {
             disabled={isPlaying}
           />
         </div>
-        <div className="card-content-section">
+        <div>
           Tone:
-          <select value={selectedNote} onChange={handleNoteChange} disabled={isPlaying}>
-            <option value="C2">C2</option>
-            <option value="D2">D2</option>
-            <option value="E2">E2</option>
-            <option value="F2">F2</option>
-            <option value="G2">G2</option>
-            <option value="A2">A2</option>
-            <option value="B2">B2</option>
-          </select>
+            <select value={selectedNote} onChange={handleNoteChange} disabled={isPlaying}>
+              <option value="C2">C2</option>
+              <option value="D2">D2</option>
+              <option value="E2">E2</option>
+              <option value="F2">F2</option>
+              <option value="G2">G2</option>
+              <option value="A2">A2</option>
+              <option value="B2">B2</option>
+            </select>
         </div>
-        <div className="card-content-section">
+        <div>
           <label>
-            Time Signature:
-            <select value={timeSignature} onChange={handleTimeSignatureChange} disabled={isPlaying}>
-              <option value="4/4">4/4</option>
-              <option value="3/4">3/4</option>
+          Time Signature:
+          <select value={timeSignature} onChange={handleTimeSignatureChange} disabled={isPlaying}>
+            <option value="4/4">4/4</option>
+            <option value="3/4">3/4</option>
             </select>
           </label>
         </div>
       </div>
       <br />
       <div className="card-content-section">
-        <label> 
-          Volume:
+        <label> Volume:
           <input
             type="range"
             min="0"
@@ -113,18 +109,24 @@ function Metronome() {
             step="0.1"
             value={volume}
             onChange={handleVolumeChange}
+            disabled={isPlaying}
           />    
+
         </label>
-        <button onClick={handleStartStop}>
+        <button onClick={handleStartStop} >
           {isPlaying ? 'Stop' : 'Start'}
         </button>
+        </div>
+        <br />
+        <div className="card-content-section">
+        <div>
+          <button onClick={handlePlaySingleBeat}>
+            Play Single Beat
+          </button>
+        </div>
+
       </div>
-      <br />
-      <div className="card-content-section">
-        <button onClick={handlePlaySingleBeat}>
-          Play Single Beat
-        </button>
-      </div>
+      </div>  
     </div>
   );
 }
